@@ -9,8 +9,11 @@ const Demo = () => {
     summary:'',
   });
   const [allArticles, setAllArticles] = useState([]); // to store all the articles that we have summarized
+  const [copied, setCopied] = useState("");
 
   const [getSummary, { error, isFetching}] = useLazyGetSummaryQuery();
+
+  const emptyArticleHistory = [];
 
   useEffect(() => {
     const articlesFromLocalStorage = JSON.parse(localStorage.getItem('articles'));
@@ -30,8 +33,17 @@ const Demo = () => {
       setAllArticles(updatedAllArticles);
 
       localStorage.setItem('articles', JSON.stringify(updatedAllArticles)); // we need to be sure it got stringified because local storage only stores strings
-      console.log(newArticle); 
     }
+  }
+
+  const handleCopy = (copyUrl) => {
+    setCopied(copyUrl);
+    navigator.clipboard.writeText(copyUrl);
+    setTimeout(() => setCopied(false), 3000);
+  }
+
+  const handleDeleteAllArticles = () => {
+    setAllArticles([]);
   }
 
   return (
@@ -60,7 +72,7 @@ const Demo = () => {
             type='submit'
             className='submit_btn peer-focus:border-gray-700 peer-focus:text-gray-700'
           >
-            Submit
+            OK
           </button>
         </form>
 
@@ -72,9 +84,9 @@ const Demo = () => {
               onClick={()=> setArticle(article)}
               className='link_card'
             >
-              <div className='copy_btn'>
+              <div className='copy_btn' onClick={()=> handleCopy(article.url)}>
                 <img 
-                  src={copy} 
+                  src={copied === article.url ? tick : copy} 
                   alt="copy_icon" 
                   className='w-[40%] h-[40%] object-contain'
                 />
@@ -85,6 +97,9 @@ const Demo = () => {
             </div>
           ))}
         </div>
+        <div className='mt-2 ml-5 text-gray-900' onClick={handleDeleteAllArticles}>
+          <button type='submit' className='p-1 border-2 rounded-lg border-gray-600 '> Clear Search History </button>
+          </div>
       </div>
 
       {/* Display Results */}
