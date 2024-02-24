@@ -8,8 +8,14 @@ const Demo = () => {
     url:'',
     summary:'',
   });
+  const [allArticles, setAllArticles] = useState([]); // to store all the articles that we have summarized
 
   const [getSummary, { error, isFetching}] = useLazyGetSummaryQuery();
+
+  useEffect(() => {
+    const articlesFromLocalStorage = JSON.parse(localStorage.getItem('articles'));
+    if(articlesFromLocalStorage) setAllArticles(articlesFromLocalStorage);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // prevent the default reload of the page
@@ -18,8 +24,12 @@ const Demo = () => {
 
     if(data?.summary) {
       const newArticle = {...article, summary:data.summary};
+      const updatedAllArticles = [newArticle, ...allArticles];
 
       setArticle(newArticle);
+      setAllArticles(updatedAllArticles);
+
+      localStorage.setItem('articles', JSON.stringify(updatedAllArticles)); // we need to be sure it got stringified because local storage only stores strings
     }
   }
 
